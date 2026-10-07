@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      คู่มือการติดตั้งและใช้งาน (Android Setup & Build Guide) - AccountMobile
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Sidebar / Table of Contents -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">AM</div>
+        <div class="brand-info">
+          <h2>AccountMobile</h2>
+          <span>Android Build Guide</span>
+        </div>
+      </div>
+
+      <div class="nav-title">สารบัญเอกสาร</div>
+      <ul class="nav-list" id="navList">
+        <li>
+          <a href="#prerequisites"><span>1.</span> ความต้องการของระบบ</a>
+        </li>
+        <li>
+          <a href="#env-vars"><span>2.</span> การตั้งค่า Environment</a>
+        </li>
+        <li>
+          <a href="#android-config"
+            ><span>3.</span> การตั้งค่า Config Android</a
+          >
+        </li>
+        <li>
+          <a href="#dependencies"><span>4.</span> การติดตั้ง Dependencies</a>
+        </li>
+        <li>
+          <a href="#dev-mode"><span>5.</span> รันแอปพลิเคชัน (Dev)</a>
+        </li>
+        <li>
+          <a href="#build-apk"><span>6.</span> Build APK ด้วย Gradle</a>
+        </li>
+        <li>
+          <a href="#code-quality"><span>7.</span> ตรวจสอบคุณภาพโค้ด</a>
+        </li>
+        <li>
+          <a href="#troubleshooting"><span>8.</span> แก้ไขปัญหาที่พบบ่อย</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <!-- Top Action Bar -->
+      <div class="top-bar">
+        <button
+          class="mobile-menu-btn"
+          id="menuToggle"
+          aria-label="Toggle navigation"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <span>เมนู</span>
+        </button>
+
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span id="themeIcon">🌙</span>
+          <span id="themeText">โหมดมืด</span>
+        </button>
+      </div>
+
+      <!-- Header Section -->
+      <header class="page-header">
+        <div class="badge-bar">
+          <span class="badge">React Native / Expo 57</span>
+          <span class="badge">Android SDK 35/36</span>
+          <span class="badge">OpenJDK 17 LTS</span>
+        </div>
+        <h1>
+          คู่มือการติดตั้งและใช้งาน<br /><span
+            style="color: var(--accent-color); font-size: 0.9em"
+            >(Android Setup & Build Guide)</span
+          >
+        </h1>
+        <p class="lead">
+          เอกสารนี้รวบรวมขั้นตอนการเตรียมสภาพแวดล้อม (Environment Setup),
+          การรันโปรเจกต์ในโหมด Development, และขั้นตอนการ Build ไฟล์ติดตั้ง APK
+          ผ่าน Gradle (<code>gradlew</code>) สำหรับโปรเจกต์
+          <strong>AccountMobile</strong>
+        </p>
+      </header>
+
+      <!-- 1. ความต้องการของระบบ (Prerequisites) -->
+      <section class="doc-section" id="prerequisites">
+        <h2 class="section-heading">
+          <span>1. ความต้องการของระบบ (Prerequisites)</span>
+        </h2>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ซอฟต์แวร์ / เครื่องมือ</th>
+                <th>เวอร์ชันที่แนะนำ</th>
+                <th>หมายเหตุ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Node.js</strong></td>
+                <td><code>v20.x</code> หรือ <code>v22.x</code> (LTS)</td>
+                <td>ตรวจสอบด้วย <code>node -v</code></td>
+              </tr>
+              <tr>
+                <td><strong>Java Development Kit (JDK)</strong></td>
+                <td><strong style="color: #059669">OpenJDK 17 LTS</strong></td>
+                <td>
+                  <strong>สำคัญมาก:</strong> Android Gradle Plugin (AGP)
+                  ไม่รองรับ JDK 25/27
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Android Studio</strong></td>
+                <td>เวอร์ชันล่าสุด (Ladybug หรือใหม่กว่า)</td>
+                <td>สำหรับจัดการ Android SDK, NDK และ Emulator</td>
+              </tr>
+              <tr>
+                <td><strong>Android SDK Platform</strong></td>
+                <td><code>API 35</code> / <code>36</code></td>
+                <td>ติดตั้งผ่าน SDK Manager ใน Android Studio</td>
+              </tr>
+              <tr>
+                <td><strong>Android SDK Build-Tools</strong></td>
+                <td><code>35.0.0</code> หรือ <code>36.0.0</code></td>
+                <td>ติดตั้งผ่าน SDK Manager</td>
+              </tr>
+              <tr>
+                <td><strong>Android NDK & CMake</strong></td>
+                <td>NDK 27.x ขึ้นไป, CMake 3.22+</td>
+                <td>จำเป็นสำหรับการคอมไพล์ C++ Native Modules</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub-heading">วิธีติดตั้ง JDK 17 (หากยังไม่มี)</h3>
+        <p>
+          สามารถติดตั้งผ่าน Windows Package Manager (<code>winget</code>)
+          ได้ด้วยคำสั่ง:
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">powershell</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-powershell">winget install --id Microsoft.OpenJDK.17 --silent --accept-package-agreements --accept-source-agreements</code></pre>
+        </div>
+
+        <p>พาธเริ่มต้นจะอยู่ที่:</p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">path</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code>C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot</code></pre>
+        </div>
+      </section>
+
+      <!-- 2. การตั้งค่า Environment Variables -->
+      <section class="doc-section" id="env-vars">
+        <h2 class="section-heading">
+          <span>2. การตั้งค่า Environment Variables</span>
+        </h2>
+        <p>
+          เพิ่มตัวแปรระบบ (System/User Environment Variables) บน Windows
+          เพื่อให้คำสั่งต่าง ๆ ทำงานได้ถูกต้อง:
+        </p>
+
+        <h3 class="sub-heading">2.1 JAVA_HOME</h3>
+        <p>กำหนดให้ชี้ไปยังโฟลเดอร์ JDK 17:</p>
+        <ul>
+          <li><strong>ตัวแปร:</strong> <code>JAVA_HOME</code></li>
+          <li>
+            <strong>ค่า (Path):</strong>
+            <code>C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot</code>
+          </li>
+        </ul>
+        <p><em>ตั้งค่าผ่าน PowerShell (รันครั้งเดียว):</em></p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">powershell</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-powershell">[Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot", "User")</code></pre>
+        </div>
+
+        <h3 class="sub-heading">2.2 ANDROID_HOME</h3>
+        <p>กำหนดให้ชี้ไปยังโฟลเดอร์ Android SDK:</p>
+        <ul>
+          <li><strong>ตัวแปร:</strong> <code>ANDROID_HOME</code></li>
+          <li>
+            <strong>ค่า (Path):</strong>
+            <code>C:\Users\&lt;ชื่อผู้ใช้&gt;\AppData\Local\Android\Sdk</code>
+          </li>
+        </ul>
+        <p>
+          <em
+            >ตั้งค่าผ่าน PowerShell (แทนที่
+            <code>&lt;Username&gt;</code> ด้วยชื่อผู้ใช้ของคุณ):</em
+          >
+        </p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">powershell</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-powershell">[Environment]::SetEnvironmentVariable("ANDROID_HOME", "$env:LOCALAPPDATA\Android\Sdk", "User")</code></pre>
+        </div>
+
+        <h3 class="sub-heading">2.3 PATH</h3>
+        <p>เพิ่มพาธเครื่องมือ Android ลงในตัวแปร <code>Path</code>:</p>
+        <ul>
+          <li>
+            <code>%ANDROID_HOME%\platform-tools</code> (สำหรับใช้งานคำสั่ง
+            <code>adb</code>)
+          </li>
+          <li><code>%ANDROID_HOME%\cmdline-tools\latest\bin</code></li>
+          <li><code>%JAVA_HOME%\bin</code></li>
+        </ul>
+      </section>
+
+      <!-- 3. การตั้งค่าไฟล์ Config สำหรับ Android -->
+      <section class="doc-section" id="android-config">
+        <h2 class="section-heading">
+          <span>3. การตั้งค่าไฟล์ Config สำหรับ Android</span>
+        </h2>
+
+        <h3 class="sub-heading">
+          3.1 ไฟล์ <code>android/local.properties</code>
+        </h3>
+        <p>
+          ไฟล์นี้ใช้ระบุตำแหน่งของ Android SDK ในเครื่อง ให้สร้างไฟล์
+          <code>android/local.properties</code> (หากยังไม่มี) และระบุ:
+        </p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">properties</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-properties">sdk.dir=C\:\\Users\\&lt;ชื่อผู้ใช้&gt;\\AppData\\Local\\Android\\Sdk</code></pre>
+        </div>
+        <p>
+          <em
+            >(ตัวอย่างเครื่องปัจจุบัน:
+            <code>sdk.dir=C\:\\Users\\mighty\\AppData\\Local\\Android\\Sdk</code
+            >)</em
+          >
+        </p>
+
+        <h3 class="sub-heading">
+          3.2 ไฟล์ <code>android/gradle.properties</code>
+        </h3>
+        <p>
+          ตรวจสอบให้แน่ใจว่าได้ระบุ <code>org.gradle.java.home</code> ชี้ไปที่
+          JDK 17 เพื่อป้องกันไม่ให้ Gradle สลับไปใช้ JDK ตัวอื่น:
+        </p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">properties</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-properties">org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+org.gradle.java.home=C\:/Program Files/Microsoft/jdk-17.0.20.101-hotspot</code></pre>
+        </div>
+      </section>
+
+      <!-- 4. การติดตั้ง Dependencies -->
+      <section class="doc-section" id="dependencies">
+        <h2 class="section-heading">
+          <span>4. การติดตั้ง Dependencies</span>
+        </h2>
+        <p>
+          เปิด Terminal ที่ root โฟลเดอร์ของโปรเจกต์
+          (<code>D:\accountMobile</code>):
+        </p>
+
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-bash"># ติดตั้งแพ็กเกจ npm ทั้งหมด
+npm install</code></pre>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              ></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            ข้อควรระวังสำหรับ Expo
+          </div>
+          <p>
+            หากต้องการติดตั้งไลบรารีใหม่ที่เป็นของ Expo แนะนำให้ใช้คำสั่ง
+            <code>npx expo install &lt;package-name&gt;</code> เสมอ
+            เพื่อให้ได้เวอร์ชันที่ตรงกับ Expo SDK 57
+          </p>
+        </div>
+      </section>
+
+      <!-- 5. การรันแอปพลิเคชัน (Development Mode) -->
+      <section class="doc-section" id="dev-mode">
+        <h2 class="section-heading">
+          <span>5. การรันแอปพลิเคชัน (Development Mode)</span>
+        </h2>
+
+        <h3 class="sub-heading">5.1 เริ่มต้นรัน Metro Dev Server</h3>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-bash">npm start
+# หรือ
+npx expo start</code></pre>
+        </div>
+
+        <h3 class="sub-heading">
+          5.2 รันแอปพลิเคชันบน Android (Emulator หรือ เครื่องจริง)
+        </h3>
+        <p>
+          ตรวจสอบว่าเปิด Emulator หรือเสียบสาย USB (เปิด USB Debugging) แล้ว
+          ตรวจสอบด้วยคำสั่ง:
+        </p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-bash">adb devices</code></pre>
+        </div>
+
+        <p>จากนั้นรันคำสั่ง:</p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-bash">npm run android
+# หรือ
+npx expo run:android</code></pre>
+        </div>
+        <p>
+          คำสั่งนี้จะทำการ build ดีบัก APK และติดตั้งลงอุปกรณ์ พร้อมเปิด Metro
+          Bundler เพื่อรองรับ Fast Refresh
+        </p>
+      </section>
+
+      <!-- 6. การ Build ไฟล์ APK ด้วย Gradle (gradlew) -->
+      <section class="doc-section" id="build-apk">
+        <h2 class="section-heading">
+          <span>6. การ Build ไฟล์ APK ด้วย Gradle (gradlew)</span>
+        </h2>
+
+        <h3 class="sub-heading">
+          ความแตกต่างระหว่าง Debug APK และ Release APK
+        </h3>
+        <div class="grid-two">
+          <div class="card-info">
+            <h4>📦 Release APK</h4>
+            <p>
+              มีการรวบรวมโค้ด JavaScript ทั้งหมด แปลงเป็น Hermes Bytecode ฝัง
+              Assets และ Resource ลงในตัว APK ทำให้เป็นไฟล์แบบ
+              <strong>Standalone</strong>
+              สามารถส่งไฟล์ไปติดตั้งและเปิดใช้งานได้ทันทีบนอุปกรณ์ใดก็ได้โดยไม่ต้องเปิดเซิร์ฟเวอร์
+            </p>
+          </div>
+          <div class="card-info">
+            <h4>🛠️ Debug APK</h4>
+            <p>
+              ตัว APK จะรอการเชื่อมต่อกับ Metro Development Server
+              เหมาะสำหรับใช้ระหว่างขั้นตอนการพัฒนาและทดสอบดีบัก
+            </p>
+          </div>
+        </div>
+
+        <h3 class="sub-heading">
+          6.1 ขั้นตอนการ Build Release APK (แนะนำสำหรับนำไปใช้งาน)
+        </h3>
+        <ol>
+          <li>เปิด PowerShell หรือ Command Prompt</li>
+          <li>
+            ไปยังโฟลเดอร์ <code>android</code>:
+            <div class="code-block-wrapper">
+              <div class="code-header">
+                <span class="code-lang">powershell</span>
+                <button class="copy-btn">คัดลอก</button>
+              </div>
+              <pre><code class="language-powershell">cd D:\accountMobile\android</code></pre>
+            </div>
+          </li>
+          <li>
+            สั่งหยุด daemon เก่า (ถ้ามี) และเริ่ม Build Release APK:
+            <div class="code-block-wrapper">
+              <div class="code-header">
+                <span class="code-lang">powershell</span>
+                <button class="copy-btn">คัดลอก</button>
+              </div>
+              <pre><code class="language-powershell">.\gradlew.bat assembleRelease</code></pre>
+            </div>
+            <p>
+              <em
+                >(หากต้องการ Clean Build ก่อน ให้รัน
+                <code>.\gradlew.bat clean assembleRelease</code>)</em
+              >
+            </p>
+          </li>
+          <li>
+            <strong>ตำแหน่งไฟล์ APK ที่ได้:</strong>
+            <div class="code-block-wrapper">
+              <div class="code-header">
+                <span class="code-lang">path</span>
+                <button class="copy-btn">คัดลอก</button>
+              </div>
+              <pre><code>D:\accountMobile\android\app\build\outputs\apk\release\app-release.apk</code></pre>
+            </div>
+          </li>
+        </ol>
+
+        <h3 class="sub-heading">6.2 ขั้นตอนการ Build Debug APK</h3>
+        <p>หากต้องการสร้าง APK สำหรับการทดสอบดีบัก:</p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">powershell</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-powershell">cd D:\accountMobile\android
+.\gradlew.bat assembleDebug</code></pre>
+        </div>
+
+        <p><strong>ตำแหน่งไฟล์ APK ที่ได้:</strong></p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">path</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code>D:\accountMobile\android\app\build\outputs\apk\debug\app-debug.apk</code></pre>
+        </div>
+
+        <h3 class="sub-heading">6.3 วิธีติดตั้ง APK ลงในมือถือผ่าน ADB</h3>
+        <p>
+          เมื่อเสียบสาย USB และเปิด USB Debugging แล้ว
+          สามารถใช้คำสั่งนี้เพื่อติดตั้ง APK ลงเครื่องได้โดยตรง:
+        </p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">powershell</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-powershell">adb install -r D:\accountMobile\android\app\build\outputs\apk\release\app-release.apk</code></pre>
+        </div>
+        <p>
+          <em
+            >(ตัวเลือก <code>-r</code> หมายถึง reinstall
+            เพื่ออัปเดตทับแอปเดิมโดยไม่ลบข้อมูล)</em
+          >
+        </p>
+      </section>
+
+      <!-- 7. การตรวจสอบคุณภาพโค้ด (Lint & Typecheck) -->
+      <section class="doc-section" id="code-quality">
+        <h2 class="section-heading">
+          <span>7. การตรวจสอบคุณภาพโค้ด (Lint & Typecheck)</span>
+        </h2>
+        <p>ก่อนทำการ build หรือ commit โค้ด ควรตรวจสอบความถูกต้องเสมอ:</p>
+        <div class="code-block-wrapper">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn">คัดลอก</button>
+          </div>
+          <pre><code class="language-bash"># ตรวจสอบ TypeScript Types
+npx tsc --noEmit
+
+# ตรวจสอบโค้ดด้วย ESLint (Expo Lint)
+npx expo lint</code></pre>
+        </div>
+      </section>
+
+      <!-- 8. การแก้ไขปัญหาที่พบบ่อย (Troubleshooting) -->
+      <section class="doc-section" id="troubleshooting">
+        <h2 class="section-heading">
+          <span>8. การแก้ไขปัญหาที่พบบ่อย (Troubleshooting)</span>
+        </h2>
+
+        <!-- Issue 1 -->
+        <div class="troubleshoot-card">
+          <div class="troubleshoot-header">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span
+              >1. Error:
+              <code
+                >Error while executing process ... jlink.exe with
+                arguments</code
+              >
+              หรือ <code>JdkImageTransform</code> ล้มเหลว</span
+            >
+          </div>
+          <div class="troubleshoot-body">
+            <div class="troubleshoot-row">
+              <strong>สาเหตุ:</strong> เกิดจากการใช้ Java เวอร์ชันที่ใหม่เกินไป
+              (เช่น JDK 25 หรือ JDK 27) ซึ่งระบบโมดูลไม่เข้ากันกับ Android
+              Gradle Plugin
+            </div>
+            <div class="troubleshoot-row">
+              <strong>วิธีแก้:</strong> ติดตั้ง
+              <strong>JDK 17 LTS</strong> และกำหนด
+              <code
+                >org.gradle.java.home=C\:/Program
+                Files/Microsoft/jdk-17.0.20.101-hotspot</code
+              >
+              ในไฟล์ <code>android/gradle.properties</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 2 -->
+        <div class="troubleshoot-card">
+          <div class="troubleshoot-header">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span
+              >2. Error:
+              <code
+                >SDK location not found. Define a location with an
+                ANDROID_HOME...</code
+              ></span
+            >
+          </div>
+          <div class="troubleshoot-body">
+            <div class="troubleshoot-row">
+              <strong>สาเหตุ:</strong> Gradle หาตำแหน่งของ Android SDK ไม่พบ
+            </div>
+            <div class="troubleshoot-row">
+              <strong>วิธีแก้:</strong> สร้างไฟล์
+              <code>android/local.properties</code> และระบุ
+              <code
+                >sdk.dir=C\:\\Users\\&lt;Username&gt;\\AppData\\Local\\Android\\Sdk</code
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 3 -->
+        <div class="troubleshoot-card">
+          <div class="troubleshoot-header">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>3. Gradle Daemon เกิดอาการค้างหรือกินหน่วยความจำสูง</span>
+          </div>
+          <div class="troubleshoot-body">
+            <div class="troubleshoot-row">
+              <strong>วิธีแก้:</strong> สั่งปิดการทำงานของ Daemon
+              ทั้งหมดด้วยคำสั่ง:
+              <div class="code-block-wrapper" style="margin-top: 0.5rem">
+                <div class="code-header">
+                  <span class="code-lang">powershell</span>
+                  <button class="copy-btn">คัดลอก</button>
+                </div>
+                <pre><code class="language-powershell">cd android
+.\gradlew.bat --stop</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 4 -->
+        <div class="troubleshoot-card">
+          <div class="troubleshoot-header">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span
+              >4. มีการติดตั้งไลบรารีที่มี Native Code เพิ่มเติม แล้ว Build
+              ไม่ผ่าน</span
+            >
+          </div>
+          <div class="troubleshoot-body">
+            <div class="troubleshoot-row">
+              <strong>วิธีแก้:</strong> สำหรับโปรเจกต์ Expo ที่ใช้ Prebuild
+              หากมีการเพิ่มหรือเปลี่ยน Native Library ให้รันคำสั่ง:
+              <div class="code-block-wrapper" style="margin-top: 0.5rem">
+                <div class="code-header">
+                  <span class="code-lang">bash</span>
+                  <button class="copy-btn">คัดลอก</button>
+                </div>
+                <pre><code class="language-bash">npx expo prebuild --clean</code></pre>
+              </div>
+              เพื่อสร้างโฟลเดอร์
+              <code>android/</code> ใหม่ให้สอดคล้องกับการตั้งค่าล่าสุดใน
+              <code>app.json</code> และ <code>package.json</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer>
+        <p>© AccountMobile — Android Setup & Build Guide</p>
+      </footer>
+    </main>
+
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop" aria-label="เลื่อนขึ้นบนสุด">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+
+    <script src="script.js"></script>
+  </body>
+</html>
